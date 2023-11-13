@@ -51,12 +51,16 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 	};
 }).then( function(data) 
 {		
+
+	const thisState = "North Carolina"; // Currently hard-coded state value. Change this to get graphs for other states.
+	const stateData = data.filter(d => d.state == thisState);
+	
 	const x = d3.scaleTime() // Create the x-axis by scaling by time values that will be initialized with the dates given.
 	.domain([new Date(d3.min(data, d=> d.year)),new Date(d3.max(data, d=> d.year))]) // Creates new dates equal to the years given by the csv and use the min and max as the domain bounds.
 	.range([0, width]); // Make the graph as large as the defined width. 
-		
+	
 	const y = d3.scaleLinear() // Create the y-axis by scaling linear.
-	.domain([d3.max(data, d=> 2000000), 0]) // Create the domain bounds based on the rounds.
+	.domain([d3.max(stateData, d=> d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol), 0]) // Create the domain bounds based on the rounds.
 	.range([0, height]); // Make the graph as large as the defined height.
 	
 	svg.append("g")
@@ -66,21 +70,11 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 	svg.append("g")
 	.call(d3.axisLeft(y));
 	
-		svg.append("g") // Append the g element for the presidents' trophy dots.
+	svg.append("g") // Append the g element for the presidents' trophy dots.
 	.selectAll("dot") // Select the dots.
-	.data(data) // Use our csv data as the data.
+	.data(stateData) // Use our csv data as the data.
 	.join("circle") // Add circles. These will be our dots.
-	.attr("r", function(d) 
-	{
-		if (d.state == "North Carolina")
-		{
-			return 5;
-		}
-		else
-		{
-			return 0;
-		}
-	})
+	.attr("r", 5)
 	.attr("cx", function (d) 
 	{
 		return x(new Date(d.year)); // Set the x value of the dot to be equal to the amount of points on the x axis.
@@ -93,19 +87,9 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 	
 	svg.append("g") // Append the g element for the presidents' trophy dots.
 	.selectAll("dot") // Select the dots.
-	.data(data) // Use our csv data as the data.
+	.data(stateData) // Use our csv data as the data.
 	.join("circle") // Add circles. These will be our dots.
-	.attr("r", function(d) 
-	{
-		if (d.state == "North Carolina")
-		{
-			return 5;
-		}
-		else
-		{
-			return 0;
-		}
-	})
+	.attr("r", 5)
 	.attr("cx", function (d) 
 	{
 		return x(new Date(d.year)); // Set the x value of the dot to be equal to the amount of points on the x axis.
