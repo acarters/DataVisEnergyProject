@@ -168,8 +168,23 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		{
             return y(d.geothermal + d.hydropower + d.solar + d.wind + d.wood);
         })
-        .attr("fill", "blue");
-			
+        .attr("fill", "blue")
+		.on("mousemove", function (e, d) // Check if the mouse moves in the Presidents' Trophy bar graph.
+		{
+			d3.select(this).attr("opacity", 0.6);  // Decrease the opacity of the bar graph, making it look lighter when hovering over it. Makes it seem more clickable.
+			return tooltip
+			.style("visibility", "visible")
+			.style("top", (+d3.select(this).attr("cy")) + "px") // Move the tooltip in the chart to the round count on the y-axis corresponding to the clicked bar's round count. + an offset.
+			.style("left", (+d3.select(this).attr("cx") + 50) + "px") // Move the tooltip in the chart to the date on the x-axis corresponding to the clicked bar's date. + an offset.
+			.html("Renewable energy consumed in " + d.year + ": <br>" + (d.geothermal + d.hydropower + d.solar + d.wind + d.wood) + " billion BTU <br>" + Math.round(100*(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol) / (d.geothermal + d.hydropower + d.solar + d.wind + d.wood))/100 + " times less than non-renewable");
+		})
+		.on("mouseout", function(d)
+		{
+			d3.select(this).attr("opacity", 1);
+			return tooltip
+			.style("visibility", "hidden")
+		});
+		
 		svg.append("g") // Append the g element for the presidents' trophy dots.
 		.selectAll("dot") // Select the dots.
 		.data(stateData) // Use our csv data as the data.
@@ -183,8 +198,34 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		{
 			return y(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol); // Non-Renewable fuel sources
 		}) 
-		.attr("fill", "red");	
+		.attr("fill", "red")	
+		.on("mousemove", function (e, d) // Check if the mouse moves in the Presidents' Trophy bar graph.
+		{
+			d3.select(this).attr("opacity", 0.6);  // Decrease the opacity of the bar graph, making it look lighter when hovering over it. Makes it seem more clickable.
+			return tooltip
+			.style("visibility", "visible")
+			.style("top", (+d3.select(this).attr("cy")) + "px") // Move the tooltip in the chart to the round count on the y-axis corresponding to the clicked bar's round count. + an offset.
+			.style("left", (+d3.select(this).attr("cx") + 50) + "px") // Move the tooltip in the chart to the date on the x-axis corresponding to the clicked bar's date. + an offset.
+			.html("Non-renewable energy consumed in " + d.year + ": <br>" + (d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol) + " billion BTU <br>" + Math.round(100*(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol) / (d.geothermal + d.hydropower + d.solar + d.wind + d.wood))/100 + " times more than renewable");
+		})
+		.on("mouseout", function(d)
+		{
+			d3.select(this).attr("opacity", 1);
+			return tooltip
+			.style("visibility", "hidden")
+		})
     });
+	
+		var tooltip = d3.select("#chart") // Select the chart.
+		.append("div") // Add a new div to the chart.
+		.style("position", "absolute") // Make the tooltip use absolute coordinates.
+		.style("visibility", "hidden") // Make the tooltip hidden by default.
+		.style("background-color", "lightgrey") // Make the tooltip's background color a light grey.
+		.style("padding", "5px") // Give the tooltip 5px of padding.
+		.style("border-radius", "5px") // Give the tooltip a round border.
+		.style("font-family", "sans-serif") // Set the font.
+		.style("text-align", "center") // Center the text of the tooltip.
+		.attr("id", "tooltip") // Set the tooltip's id, allowing it to be easily accessed later.
 
 		var options = dropDown.selectAll("option")
 		.data(data1987)
