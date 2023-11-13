@@ -24,7 +24,7 @@
 <div id="chart"></div>
 
 <script>
-const margin = {top: 50, right: 50, bottom: 50, left: 50}, width = 1000 - margin.left - margin.right, height = 400 - margin.top - margin.bottom; // Define the margins for the first chart.
+const margin = {top: 50, right: 50, bottom: 50, left: 80}, width = 1000 - margin.left - margin.right, height = 400 - margin.top - margin.bottom; // Define the margins for the first chart.
 const svg = d3.select("#chart") // Select the first chart.
 .append("svg") // Append an svg element to the first chart div.
 .attr("width", width + margin.left + margin.right) // Define the width of the chart using the margins and the defined width.
@@ -58,20 +58,43 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 	};
 }).then( function(data) 
 {		
-
 	var thisState = "Select State"; // Currently hard-coded state value. Change this to get graphs for other states.
 	var stateData = data.filter(d => d.state == thisState);
 	const data1987 = data.filter(d => d.year == 1987); // Just the data for 1987. Arbitrary year, but this ensures we can populate drop-down with only one value per state.
 	
 	var dropDown = d3.select("#stateSelect")
 	.on('change', function() 
-    {
+    {	
         svg.selectAll("g").remove();
         svg.selectAll("path").remove();
 		svg.selectAll("line").remove();
+		svg.selectAll("text").remove();
         
         thisState = d3.select(this).property('value');
         stateData = data.filter(d => d.state == thisState);
+		
+		svg.append("text") // Add a new text element to the chart, the title.
+		.text("Non-renewable vs Renewable Power Consumption in " + thisState + " by Year") // Edit the text of the title.
+		.attr("x", 0) // Position the title on the x-axis.
+		.attr("y", -20) // Position the title on the y-axis.
+		.attr("font-size","20px") // Set the font size.
+		.attr("font-family", "sans-serif") // Set the font.
+		.attr("font-weight", "bold"); // Make the text bold
+		
+		svg.append("text") // Add a new text element to the chart, the x-axis label.
+		.text("Year") // Edit the text of the label.
+		.attr("x", 420) // Position the label on the x-axis.
+		.attr("y", 335) // Position the label on the y-axis.
+		.attr("font-family", "sans-serif") // Set the font.
+		.attr("font-style", "italic"); // Make the text italic.
+			
+		svg.append("text") // Add a new text element to the chart, the y-axis label.
+		.text("Consumption (in billions BTU)") // Edit the text of the label.
+		.attr("x", -250) // Position the label on the x-axis.
+		.attr("y", -60) // Position the label on the y-axis.
+		.attr("transform", "rotate(-90)") // Rotate the text 90 degrees.
+		.attr("font-family", "sans-serif") // Set the font.
+		.attr("font-style", "italic"); // Make the text italic.	
         
         const x = d3.scaleTime() // Create the x-axis by scaling by time values that will be initialized with the dates given.
         .domain([new Date(d3.min(data, d=> d.year)),new Date(d3.max(data, d=> d.year))]) // Creates new dates equal to the years given by the csv and use the min and max as the domain bounds.
