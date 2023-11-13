@@ -63,21 +63,9 @@ d3.csv("energy.csv", function(d) {
         d => d.year,
         d => d.state
     );
-    // console.log(groupedData);
 
     var currYear = 2019;
-    filteredData = d3.filter(groupedData, x => x[0] == currYear);
-    console.log(filteredData[0][1])
-
-    // aggregate country, renewable, nonrenewable after filtering by year
-    aggregatedData = Array.from(filteredData[0][1], ([state, consumption]) => {
-        const obj = {};
-        obj.state = state;
-        obj.renewable = consumption.renewable;
-        obj.nonrenewable = consumption.nonrenewable;
-        return obj;
-    })
-    console.log(aggregatedData);
+    aggregatedData = filterData(currYear);
 
     const x = d3.scaleBand()
                 .domain(aggregatedData.map(d => d["state"]))
@@ -104,7 +92,7 @@ d3.csv("energy.csv", function(d) {
     const barWidth = 10;
     var bars = svg.append("g")
         .selectAll("dot")
-        .data(aggregatedData.sort((a,b) => d3.ascending(a['nonrenewable'], b['nonrenewable'])))
+        .data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
         .join("rect")
         .attr("x", function(d) { return x(d['state']) - barWidth/2; })
         .attr("y", function(d) { return y(d['nonrenewable']); })
@@ -123,39 +111,52 @@ d3.csv("energy.csv", function(d) {
         // .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
 
 
-
     d3.select("#mySlider").on("input", function(d){
         currYear = this.value;
         updateBars(currYear, bars)
     })
 
     d3.select("#minus").on("mousedown", function(d) {
-        if (currYear > 1919) {
-            currYear -= 2;
+        if (currYear > 1960) {
+            currYear -= 1;
             updateBars(currYear, bars)
         }
     })
 
     d3.select("#plus").on("mousedown", function(d) {
-        if (currYear < 2023) {
-            currYear = parseInt(currYear) + 2;
+        if (currYear < 2019) {
+            currYear = parseInt(currYear) + 1;
             updateBars(currYear, bars)
         }
     })
+
+    function filterData(year) {
+        filteredData = d3.filter(groupedData, x => x[0] == currYear);
+
+        // aggregate country, renewable, nonrenewable after filtering by year
+        aggregatedData = Array.from(filteredData[0][1], ([state, consumption]) => {
+            const obj = {};
+            obj.state = state;
+            obj.renewable = consumption.renewable;
+            obj.nonrenewable = consumption.nonrenewable;
+            return obj;
+        })
+        // console.log(aggregatedData);
+        return aggregatedData;
+    }
 
     function updateBars(currYear, bars) {
         d3.select("#value").html("Year: " + currYear);
         document.getElementById("mySlider").value = currYear;
 
-        filteredData = d3.filter(groupedData, x => x[0] == currYear);
-        console.log(filteredData[0][1])
+        aggregatedData = filterData(currYear);
         
-        bars.data(filteredData[0][1].sort((a,b) => d3.descending(a[1].nonrenewable, b[1].nonrenewable)))
+        bars.data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
             .transition()
             .duration(500)
-            .attr("x", function(d) { return x(d[0]) - barWidth/2; })
-            .attr("y", function(d) { return y(d[1].nonrenewable); })
-            .attr("height", function(d) { return height - y(d[1].nonrenewable); })
+            .attr("x", function(d) { return x(d['state']) - barWidth/2; })
+            .attr("y", function(d) { return y(d['nonrenewable']); })
+            .attr("height", function(d) { return height - y(d['nonrenewable']); })
     }
 })
 </script>
