@@ -13,7 +13,14 @@
     }
 </style>
 <script src="https://d3js.org/d3.v6.js"></script>
-
+<div>
+  <label for="stateSelect">Select State:</label>
+  <select id="stateSelect">
+    <!-- Add options for different states here -->
+    <option value="Select State" selected>Select State</option>
+    <!-- Add more state options as needed -->
+  </select>
+</div>
 <div id="chart"></div>
 
 <script>
@@ -52,66 +59,144 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 }).then( function(data) 
 {		
 
-	const thisState = "North Carolina"; // Currently hard-coded state value. Change this to get graphs for other states.
-	const stateData = data.filter(d => d.state == thisState);
+	var thisState = "Select State"; // Currently hard-coded state value. Change this to get graphs for other states.
+	var stateData = data.filter(d => d.state == thisState);
+	const data1987 = data.filter(d => d.year == 1987); // Just the data for 1987. Arbitrary year, but this ensures we can populate drop-down with only one value per state.
 	
-	const x = d3.scaleTime() // Create the x-axis by scaling by time values that will be initialized with the dates given.
-	.domain([new Date(d3.min(data, d=> d.year)),new Date(d3.max(data, d=> d.year))]) // Creates new dates equal to the years given by the csv and use the min and max as the domain bounds.
-	.range([0, width]); // Make the graph as large as the defined width. 
-	
-	const y = d3.scaleLinear() // Create the y-axis by scaling linear.
-	.domain([d3.max(stateData, d=> d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol), 0]) // Create the domain bounds based on the rounds.
-	.range([0, height]); // Make the graph as large as the defined height.
-	
-	svg.append("g")
-	.attr("transform", `translate(0, ${height})`)
-	.call(d3.axisBottom(x));
-		
-	svg.append("g")
-	.call(d3.axisLeft(y));
-	
-	svg.append("g") // Append the g element for the presidents' trophy dots.
-	.selectAll("dot") // Select the dots.
-	.data(stateData) // Use our csv data as the data.
-	.join("circle") // Add circles. These will be our dots.
-	.attr("r", 5)
-	.attr("cx", function (d) 
-	{
-		return x(new Date(d.year)); // Set the x value of the dot to be equal to the amount of points on the x axis.
-	}) 
-	.attr("cy", function (d) 
-	{	
-		return y(d.geothermal + d.hydropower + d.solar + d.wind + d.wood); // Renewable fuel sources
-	}) 
-	.attr("fill", "blue");
-	
-	svg.append("g") // Append the g element for the presidents' trophy dots.
-	.selectAll("dot") // Select the dots.
-	.data(stateData) // Use our csv data as the data.
-	.join("circle") // Add circles. These will be our dots.
-	.attr("r", 5)
-	.attr("cx", function (d) 
-	{
-		return x(new Date(d.year)); // Set the x value of the dot to be equal to the amount of points on the x axis.
-	}) 
-	.attr("cy", function (d) 
-	{
-		/* 
-		Coal Test Cases
-		if (d.year == 1971 && d.state == "North Carolina")
+	var dropDown = d3.select("#stateSelect")
+	.on('change', function() 
+    {
+        svg.selectAll("g").remove();
+        svg.selectAll("path").remove();
+		svg.selectAll("line").remove();
+        
+        thisState = d3.select(this).property('value');
+        stateData = data.filter(d => d.state == thisState);
+        
+        const x = d3.scaleTime() // Create the x-axis by scaling by time values that will be initialized with the dates given.
+        .domain([new Date(d3.min(data, d=> d.year)),new Date(d3.max(data, d=> d.year))]) // Creates new dates equal to the years given by the csv and use the min and max as the domain bounds.
+        .range([0, width]); // Make the graph as large as the defined width. 
+    
+        const y = d3.scaleLinear() // Create the y-axis by scaling linear.
+        .domain([d3.max(stateData, d=> d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol), 0]) // Create the domain bounds based on the rounds.
+        .range([0, height]); // Make the graph as large as the defined height.
+        
+        svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x));
+        
+        svg.append("g")
+        .call(d3.axisLeft(y));
+        
+		svg.selectAll("renewableLine")
+        .data(stateData)
+        .enter().append("line")
+        .attr("x1", function (d, i) 
 		{
-			console.log("coalComm: " + d.coalComm);
-			console.log("coalElec: " + d.coalElec);
-			console.log("coalInd: " + d.coalInd);
-			console.log("coalRef: " + d.coalRef);
-			console.log("coalRes: " + d.coalRes);
-			console.log("coalTrans: " + d.coalTrans);
-			console.log("coal: " + d.coal);
-		}
-		*/
+            if (i > 0) {
+                return x(new Date(stateData[i - 1].year));
+            }
+            return 0;
+        })
+        .attr("x2", function (d) 
+		{
+            return x(new Date(d.year));
+        })
+        .attr("y1", function (d, i) 
+		{
+            if (i > 0) 
+			{
+                return y(stateData[i - 1].geothermal + stateData[i - 1].hydropower + stateData[i - 1].solar + stateData[i - 1].wind + stateData[i - 1].wood);
+            }
+            return 0;
+        })
+        .attr("y2", function (d, i) 
+		{
+			if (i > 0) 
+			{
+				return y(d.geothermal + d.hydropower + d.solar + d.wind + d.wood);
+			}
+			return 0;	
+        })
+        .attr("stroke", "blue")
+        .attr("stroke-width", 5);
 		
-		return y(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol); // Non-Renewable fuel sources
-	}) 
-	.attr("fill", "red");
+		svg.selectAll("nonRenewableLine")
+        .data(stateData)
+        .enter().append("line")
+        .attr("x1", function (d, i) 
+		{
+            if (i > 0) {
+                return x(new Date(stateData[i - 1].year));
+            }
+            return 0;
+        })
+        .attr("x2", function (d) 
+		{
+            return x(new Date(d.year));
+        })
+        .attr("y1", function (d, i) 
+		{
+            if (i > 0) 
+			{
+                return y(stateData[i - 1].coal + stateData[i - 1].distFuelOil + stateData[i - 1].kerosene + stateData[i - 1].petroleum + stateData[i - 1].naturalGas + stateData[i - 1].otherPetrol);
+            }
+            return 0;
+        })
+        .attr("y2", function (d, i) 
+		{
+			if (i > 0) 
+			{
+				return y(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol);
+			}
+			return 0;	
+        })
+        .attr("stroke", "red")
+        .attr("stroke-width", 5);
+		
+		svg.append("g")
+        .selectAll(".dot")
+		.data(stateData)
+		.enter().append("circle")
+        .attr("class", "dot")
+        .attr("r", 5)
+        .attr("cx", function (d) 
+		{
+            return x(new Date(d.year));
+        })
+        .attr("cy", function (d) 
+		{
+            return y(d.geothermal + d.hydropower + d.solar + d.wind + d.wood);
+        })
+        .attr("fill", "blue");
+			
+		svg.append("g") // Append the g element for the presidents' trophy dots.
+		.selectAll("dot") // Select the dots.
+		.data(stateData) // Use our csv data as the data.
+		.join("circle") // Add circles. These will be our dots.
+		.attr("r", 5)
+		.attr("cx", function (d) 
+		{
+			return x(new Date(d.year)); // Set the x value of the dot to be equal to the amount of points on the x axis.
+		}) 
+		.attr("cy", function (d) 
+		{
+			return y(d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol); // Non-Renewable fuel sources
+		}) 
+		.attr("fill", "red");	
+    });
+
+		var options = dropDown.selectAll("option")
+		.data(data1987)
+		.enter()
+		.append("option")
+		.text(function(d) 
+		{
+			return d.state;
+		})
+		.attr("value", function(d) 
+		{
+			return d.state;
+		});
 })
 </script>
