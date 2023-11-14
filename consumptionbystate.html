@@ -70,35 +70,61 @@ d3.csv("energy.csv", function(d) {
     const x = d3.scaleBand()
                 .domain(aggregatedData.map(d => d["state"]))
                 .range([0, width])
-                .padding(.2);
+                .padding(.1);
 
-	const y = d3.scaleLinear()
+    const x1 = d3.scaleBand()
+                 .domain(['renewable', 'nonrenewable'])
+                 .rangeRound([0, x.bandwidth()])
+                 .padding(.05);
+
+	const y = d3.scaleSqrt()
                 .domain([0, 16000000])
                 .range([height, 0]);
+
+    const color = d3.scaleOrdinal(['red', 'green']);
 
 	svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x))
         .selectAll("text")
-        .attr("x", 9)
-        .attr("dy", ".35em")
-        .attr("transform", "rotate(090)")
-        .style("text-anchor", "start");
+        .attr("x", -7)
+        .attr("y", -5)
+        .attr("transform", "rotate(-90)")
+        .style("text-anchor", "end")
 
 	svg.append("g")
 	    .call(d3.axisLeft(y));
 
 
-    const barWidth = 10;
-    var bars = svg.append("g")
+    const barWidth = 7;
+    var nonrenewableBars = svg.append("g")
         .selectAll("dot")
         .data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
         .join("rect")
-        .attr("x", function(d) { return x(d['state']) - barWidth/2; })
+        .attr("x", function(d) { return x(d['state']); })
         .attr("y", function(d) { return y(d['nonrenewable']); })
         .attr("height", function(d) { return height - y(d['nonrenewable']); })
         .attr("width", barWidth)
-        .attr("fill", "red")
+        .attr("fill", 'red')
+        // .on("mouseover", function(e,d) {
+        //     return tooltip.style("visibility", "visible")
+        //                   .html("Count: " + d[1].count + " people"); 
+        // })
+        // .on("mousemove", function() { 
+        //     var coord = d3.pointer(event);
+        //     return tooltip.style("left", (coord[0]) + "px")
+        //                   .style("top", (coord[1]+100) + "px"); 
+        // })
+        // .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+    var renewableBars = svg.append("g")
+        .selectAll("dot")
+        .data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
+        .join("rect")
+        .attr("x", function(d) { return x(d['state']) + barWidth; })
+        .attr("y", function(d) { return y(d['renewable']); })
+        .attr("height", function(d) { return height - y(d['renewable']); })
+        .attr("width", barWidth)
+        .attr("fill", 'green')
         // .on("mouseover", function(e,d) {
         //     return tooltip.style("visibility", "visible")
         //                   .html("Count: " + d[1].count + " people"); 
@@ -113,20 +139,20 @@ d3.csv("energy.csv", function(d) {
 
     d3.select("#mySlider").on("input", function(d){
         currYear = this.value;
-        updateBars(currYear, bars)
+        updateBars(currYear, nonrenewableBars, renewableBars)
     })
 
     d3.select("#minus").on("mousedown", function(d) {
         if (currYear > 1960) {
             currYear -= 1;
-            updateBars(currYear, bars)
+            updateBars(currYear, nonrenewableBars, renewableBars)
         }
     })
 
     d3.select("#plus").on("mousedown", function(d) {
         if (currYear < 2019) {
             currYear = parseInt(currYear) + 1;
-            updateBars(currYear, bars)
+            updateBars(currYear, nonrenewableBars, renewableBars)
         }
     })
 
@@ -145,18 +171,25 @@ d3.csv("energy.csv", function(d) {
         return aggregatedData;
     }
 
-    function updateBars(currYear, bars) {
+    function updateBars(currYear, nonrenewableBars, renewableBars) {
         d3.select("#value").html("Year: " + currYear);
         document.getElementById("mySlider").value = currYear;
 
         aggregatedData = filterData(currYear);
-        
-        bars.data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
+
+        nonrenewableBars.data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
             .transition()
             .duration(500)
-            .attr("x", function(d) { return x(d['state']) - barWidth/2; })
+            .attr("x", function(d) { return x(d['state']); })
             .attr("y", function(d) { return y(d['nonrenewable']); })
             .attr("height", function(d) { return height - y(d['nonrenewable']); })
+
+        renewableBars.data(aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state'])))
+            .transition()
+            .duration(500)
+            .attr("x", function(d) { return x(d['state']) + barWidth; })
+            .attr("y", function(d) { return y(d['renewable']); })
+            .attr("height", function(d) { return height - y(d['renewable']); })
     }
 })
 </script>
