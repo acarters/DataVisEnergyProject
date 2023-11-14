@@ -1,17 +1,5 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<!-- load d3.js -->
-<!-- <style>
-    /* Apply styles to the <p> element */
-    p {
-        font-family: Arial, sans-serif; /* Set the font family */
-        font-size: 16px; /* Set the font size */
-        line-height: 1.5; /* Set line height for better readability */
-        color: #333; /* Set text color */
-        margin: 0; /* Remove default margins */
-        padding: 10px; /* Add padding for spacing */
-    }
-</style> -->
 <script src="https://d3js.org/d3.v6.js"></script>
 
 <!-- Slider -->
@@ -24,6 +12,7 @@
     </p>
 </div>
 
+<!-- Sort Buttons -->
 <div>
     <p>Sort:</p>
     <button id="alphabeticalSort">Alphabetically</button>
@@ -35,7 +24,7 @@
 <div id="chart"></div>
 
 <script>
-const margin = {top: 50, right: 50, bottom: 50, left: 80}, width = 1000 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
+const margin = {top: 50, right: 50, bottom: 100, left: 80}, width = 1000 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
 const svg = d3.select("#chart")
                 .append("svg")
                 .attr("width", width + margin.left + margin.right)
@@ -98,6 +87,11 @@ d3.csv("energy.csv", function(d) {
 	svg.append("g")
 	    .call(d3.axisLeft(y));
 
+    var tooltip = d3.select("#chart")
+                .append("div")
+                .style("position", "absolute")
+                .style("visibility", "hidden")
+                .style("background-color", "lightgrey");
 
     const barWidth = 7;
     var nonrenewableBars = svg.append("g")
@@ -109,16 +103,18 @@ d3.csv("energy.csv", function(d) {
         .attr("height", function(d) { return height - y(d['nonrenewable']); })
         .attr("width", barWidth)
         .attr("fill", 'red')
-        // .on("mouseover", function(e,d) {
-        //     return tooltip.style("visibility", "visible")
-        //                   .html("Count: " + d[1].count + " people"); 
-        // })
-        // .on("mousemove", function() { 
-        //     var coord = d3.pointer(event);
-        //     return tooltip.style("left", (coord[0]) + "px")
-        //                   .style("top", (coord[1]+100) + "px"); 
-        // })
-        // .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+        .on("mouseover", function(e,d) {
+            return tooltip.style("visibility", "visible")
+                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
+                                <font color="red">nonrenewable </font> energy`); 
+        })
+        .on("mousemove", function() { 
+            var coord = d3.pointer(event);
+            return tooltip.style("left", (coord[0]) + "px")
+                          .style("top", (coord[1]+100) + "px"); 
+        })
+        .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+
     var renewableBars = svg.append("g")
         .selectAll("dot")
         .data(aggregatedData)
@@ -128,16 +124,17 @@ d3.csv("energy.csv", function(d) {
         .attr("height", function(d) { return height - y(d['renewable']); })
         .attr("width", barWidth)
         .attr("fill", 'green')
-        // .on("mouseover", function(e,d) {
-        //     return tooltip.style("visibility", "visible")
-        //                   .html("Count: " + d[1].count + " people"); 
-        // })
-        // .on("mousemove", function() { 
-        //     var coord = d3.pointer(event);
-        //     return tooltip.style("left", (coord[0]) + "px")
-        //                   .style("top", (coord[1]+100) + "px"); 
-        // })
-        // .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
+        .on("mouseover", function(e,d) {
+            return tooltip.style("visibility", "visible")
+                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
+                                <font color="green">nonrenewable </font> energy`); 
+        })
+        .on("mousemove", function() { 
+            var coord = d3.pointer(event);
+            return tooltip.style("left", (coord[0]) + "px")
+                          .style("top", (coord[1]+100) + "px"); 
+        })
+        .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
 
 
     d3.select("#mySlider").on("input", function(d){
