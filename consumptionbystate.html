@@ -60,6 +60,7 @@ d3.csv("energy.csv", function(d) {
         d => d.state
     );
 
+    var sortType = 'alphabetical';
     var currYear = 2019;
     aggregatedData = filterData(currYear);
 
@@ -180,28 +181,22 @@ d3.csv("energy.csv", function(d) {
     })
 
     d3.select('#alphabeticalSort').on("mousedown", function(d) {
-        sortedData = aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state']));
-
-        x.domain(sortedData.map(d => d["state"]));
+        sortType = 'alphabetical';
         updateBars()
     })
 
     d3.select('#renewableSort').on("mousedown", function(d) {
-        sortedData = aggregatedData.sort((a,b) => d3.descending(a['renewable'], b['renewable']));
-
-        x.domain(sortedData.map(d => d["state"]));
+        sortType = 'renewable';
         updateBars()
     })
 
     d3.select('#nonrenewableSort').on("mousedown", function(d) {
-        sortedData = aggregatedData.sort((a,b) => d3.descending(a['nonrenewable'], b['nonrenewable']));
-
-        x.domain(sortedData.map(d => d["state"]));
+        sortType = 'nonrenewable';
         updateBars()
     })
 
     function filterData(year) {
-        filteredData = d3.filter(groupedData, x => x[0] == currYear);
+        filteredData = d3.filter(groupedData, x => x[0] == year);
 
         // aggregate country, renewable, nonrenewable after filtering by year
         aggregatedData = Array.from(filteredData[0][1], ([state, consumption]) => {
@@ -220,6 +215,14 @@ d3.csv("energy.csv", function(d) {
         document.getElementById("mySlider").value = currYear;
 
         aggregatedData = filterData(currYear);
+
+        var sortedData = aggregatedData;
+        if (sortType == 'renewable') {
+            sortedData = aggregatedData.sort((a,b) => d3.descending(a['renewable'], b['renewable']));
+        } else if (sortType == 'nonrenewable') {
+            sortedData = aggregatedData.sort((a,b) => d3.descending(a['nonrenewable'], b['nonrenewable']));
+        }
+        x.domain(sortedData.map(d => d["state"]));
  
         svg.select('.xAxis')
             .transition()
