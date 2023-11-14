@@ -63,6 +63,29 @@ d3.csv("energy.csv", function(d) {
     var currYear = 2019;
     aggregatedData = filterData(currYear);
 
+    const title = svg.append("text")
+		.text("Consumption of Renewable and Nonrenewable Energies by State")
+		.attr("x", 0)
+		.attr("y", -20)
+		.attr("font-size","20px")
+		.attr("font-family", "sans-serif")
+		.attr("font-weight", "bold");
+		
+    const xTitle = svg.append("text")
+		.text("State")
+		.attr("x", 420)
+		.attr("y", 335)
+		.attr("font-family", "sans-serif")
+		.attr("font-style", "italic");
+			
+    const yTitle = svg.append("text")
+		.text("Consumption (in billions BTU)")
+		.attr("x", -250)
+		.attr("y", -60)
+		.attr("transform", "rotate(-90)")
+		.attr("font-family", "sans-serif")
+		.attr("font-style", "italic");
+
     var x = d3.scaleBand()
                 .domain(aggregatedData.map(d => d["state"]))
                 .range([0, width])
