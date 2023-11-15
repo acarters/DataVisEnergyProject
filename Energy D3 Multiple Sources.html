@@ -10,10 +10,21 @@
         color: #333; /* Set text color */
         margin: 0; /* Remove default margins */
         padding: 10px; /* Add padding for spacing */
+	}
+
+		/* Apply styles to the legend container */
+		#legend {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px; /* Add "px" here */
+        margin-left: 1000px;
+        border: 1px solid #ccc;
     }
 </style>
 <script src="https://d3js.org/d3.v6.js"></script>
 <div>
+</div>
+
   <label for="stateSelect">Select State:</label>
   <select id="stateSelect">
     <!-- Add options for different states here -->
@@ -22,6 +33,7 @@
   </select>
 </div>
 <div id="chart"></div>
+<div id="legend"><div>
 
 <script>
 const margin = {top: 50, right: 50, bottom: 50, left: 80}, width = 1000 - margin.left - margin.right, height = 800 - margin.top - margin.bottom; // Define the margins for the first chart.
@@ -103,6 +115,36 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         const y = d3.scaleLinear() // Create the y-axis by scaling linear.
         .domain([d3.max(stateData, d=> Math.max(d.coal, d.distFuelOil, d.geothermal, d.hydropower, d.kerosene, d.petroleum, d.naturalGas, d.solar, d.wind, d.wood, d.otherPetrol)), 0]) // Create the domain bounds based on the rounds.
         .range([0, height]); // Make the graph as large as the defined height.
+
+		const fuelTypes = ["Coal", "Dist. Fuel Oil", "Geothermal", "Hydropower", "Kerosene", "Petroleum", "Natural Gas", "Solar", "Wind", "Wood", "Other Petrol"];
+    	const colors = ["black", "pink", "blue", "grey", "teal", "red", "lime", "yellow", "purple", "orange", "brown"];
+
+		const legendContainer = document.getElementById("legend");
+		legendContainer.style.marginTop = "auto"; // Reset the top margin
+		legendContainer.style.marginLeft = "1000px"; // Add this line to move the legend container to the right
+
+		const legend = d3.select(legendContainer)
+			.selectAll(".legend")
+			.data(fuelTypes)
+			.enter().append("div")
+			.attr("class", "legend")
+			.style("display", "flex")
+			.style("align-items", "center")
+			.style("margin-bottom", "5px")
+			.style("font-family", "sans-serif")
+			.style("font-size", "12px");
+
+			legendContainer.style.border = "1px solid #ccc"; // Add this line for the border around the legend container
+
+
+		legend.append("div")
+			.style("width", "18px")
+			.style("height", "18px")
+			.style("background-color", (d, i) => colors[i]);
+
+		legend.append("span")
+			.text((d, i) => fuelTypes[i])
+			.style("margin-left", "5px");
         
         svg.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -1065,3 +1107,4 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		});
 })
 </script>
+
