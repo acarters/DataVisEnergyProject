@@ -54,15 +54,12 @@ groupedData = d3.rollups(data,
     v => {
         return {
             renewable: d3.sum(v, d => (d.geothermal + d.hydropower + d.solar + d.wind + d.wood) / d.population),
-            nonrenewable: d3.sum(v, d => (d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol) / d.population)
-            
+            nonrenewable: d3.sum(v, d => (d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol) / d.population)           
         };
     },
     d => d.year,
-	//d => d.population,
     d => d.state,
 );
-console.log(groupedData);
 
 
     var sortType = 'alphabetical';
@@ -70,7 +67,7 @@ console.log(groupedData);
     aggregatedData = filterData(currYear);
 
     const title = svg.append("text")
-		.text("Consumption of Renewable and Nonrenewable Energies by State")
+		.text("Consumption of Renewable and Nonrenewable Energies by State per Capita")
 		.attr("x", 0)
 		.attr("y", -20)
 		.attr("font-size","20px")
@@ -85,7 +82,7 @@ console.log(groupedData);
 		.attr("font-style", "italic");
 			
     const yTitle = svg.append("text")
-		.text("Consumption (in billions BTU)")
+		.text("Cons. per Capita (in billions BTU)")
 		.attr("x", -250)
 		.attr("y", -60)
 		.attr("transform", "rotate(-90)")
@@ -147,8 +144,8 @@ console.log(groupedData);
         .attr("fill", 'red')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
-                                <font color="red">nonrenewable </font> energy`); 
+                          .html(`${d['state']} consumed ${Math.round(d['nonrenewable']*1000)/1000} <br>
+                                <font color="red">non-renewable </font> energy per person`); 
         })
         .on("mousemove", function() { 
             var coord = d3.pointer(event);
@@ -163,23 +160,15 @@ console.log(groupedData);
         .join("rect")
         .attr("x", function(d) { return x(d['state']) + barWidth; })
 
-
-
         // stuff
         .attr("y", function(d) { return y(d['renewable']); })
         .attr("height", function(d) { return height - y(d['renewable']); })
-
-
-
-
-
-
         .attr("width", barWidth)
         .attr("fill", 'green')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
-                                <font color="green">nonrenewable </font> energy per person`); 
+                          .html(`${d['state']} consumed ${Math.round(d['renewable']*1000)/1000} <br>
+                                <font color="green">renewable </font> energy per person`); 
         })
         .on("mousemove", function() { 
             var coord = d3.pointer(event);
@@ -273,7 +262,7 @@ console.log(groupedData);
     function filterData(year) {
         filteredData = d3.filter(groupedData, x => x[0] == year);
 
-        console.log(filteredData[0][1])
+       //console.log(filteredData[0][1])
         // aggregate country, renewable, nonrenewable after filtering by year
         aggregatedData = Array.from(filteredData[0][1], ([state, consumption]) => {
             const obj = {};
