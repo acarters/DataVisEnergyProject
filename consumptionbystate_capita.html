@@ -144,7 +144,7 @@ groupedData = d3.rollups(data,
         .attr("fill", 'red')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${Math.round(d['nonrenewable']*1000)/1000} <br>
+                          .html(`${d['state']} consumed ${Math.round(d['nonrenewable']*1000)/1000} billion BTU <br>
                                 <font color="red">non-renewable </font> energy per person`); 
         })
         .on("mousemove", function() { 
@@ -167,7 +167,7 @@ groupedData = d3.rollups(data,
         .attr("fill", 'green')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${Math.round(d['renewable']*1000)/1000} <br>
+                          .html(`${d['state']} consumed ${Math.round(d['renewable']*1000)/1000} billion BTU <br>
                                 <font color="green">renewable </font> energy per person`); 
         })
         .on("mousemove", function() { 

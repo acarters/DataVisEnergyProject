@@ -147,7 +147,7 @@ d3.csv("energy.csv", function(d) {
         .attr("fill", 'red')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
+                          .html(`${d['state']} consumed ${d['nonrenewable']} billion BTU <br>
                                 <font color="red">nonrenewable </font> energy`); 
         })
         .on("mousemove", function() { 
@@ -176,7 +176,7 @@ d3.csv("energy.csv", function(d) {
         .attr("fill", 'green')
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
-                          .html(`${d['state']} consumed ${d['nonrenewable']} <br>
+                          .html(`${d['state']} consumed ${d['nonrenewable']} billion BTU <br>
                                 <font color="green">renewable </font> energy`); 
         })
         .on("mousemove", function() { 
