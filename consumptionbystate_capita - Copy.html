@@ -50,19 +50,16 @@ d3.csv("energy - Copy - Copy.csv", function(d) {
 	};
 }).then( function(data) {
 
-groupedData = d3.rollups(data,
-    v => {
-        return {
-            renewable: d3.sum(v, d => d.geothermal + d.hydropower + d.solar + d.wind + d.wood),
-            nonrenewable: d3.sum(v, d => d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol),
-        };
-    },
-    d => d.year,
-	d => d.population,
-    d => d.state,
-);
-console.log(groupedData);
-
+    groupedData = d3.rollups(data,
+        v => {
+            return {
+                renewable: d3.sum(v, d => d.geothermal + d.hydropower + d.solar + d.wind + d.wood),
+                nonrenewable: d3.sum(v, d => d.coal + d.distFuelOil + d.kerosene + d.petroleum + d.naturalGas + d.otherPetrol)
+            }
+        },
+        d => d.year,
+        d => d.state
+    );
 
     var sortType = 'alphabetical';
     var currYear = 2019;
@@ -135,9 +132,8 @@ console.log(groupedData);
 
         .attr("y", function(d) { return y(d['nonrenewable']); })
         .attr("height", function(d) { 
-		console.log("state: " + d['state']);
 		console.log("nonrenewable: " + +d['nonrenewable']);
-		//console.log("population: " + +d['population']);
+		console.log("population: " + +d['population']);
 		return height - y(d['nonrenewable']); })
 
 
@@ -271,14 +267,16 @@ console.log(groupedData);
 
     function filterData(year) {
         filteredData = d3.filter(groupedData, x => x[0] == year);
+
         // aggregate country, renewable, nonrenewable after filtering by year
-        aggregatedData = Array.from(filteredData[0][1], ([population, consumption, state]) => {
+        aggregatedData = Array.from(filteredData[0][1], ([state, consumption]) => {
             const obj = {};
             obj.state = state;
             obj.renewable = consumption.renewable;
             obj.nonrenewable = consumption.nonrenewable;
             return obj;
         })
+        // console.log(aggregatedData);
         return aggregatedData.sort((a,b) => d3.ascending(a['state'], b['state']));
     }
 
