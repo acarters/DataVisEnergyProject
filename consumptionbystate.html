@@ -177,7 +177,7 @@ d3.csv("energy.csv", function(d) {
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
                           .html(`${d['state']} consumed ${d['nonrenewable']} <br>
-                                <font color="green">nonrenewable </font> energy`); 
+                                <font color="green">renewable </font> energy`); 
         })
         .on("mousemove", function() { 
             var coord = d3.pointer(event);
