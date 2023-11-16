@@ -179,7 +179,7 @@ console.log(groupedData);
         .on("mouseover", function(e,d) {
             return tooltip.style("visibility", "visible")
                           .html(`${d['state']} consumed ${d['nonrenewable']} <br>
-                                <font color="green">nonrenewable </font> energy`); 
+                                <font color="green">nonrenewable </font> energy per person`); 
         })
         .on("mousemove", function() { 
             var coord = d3.pointer(event);
