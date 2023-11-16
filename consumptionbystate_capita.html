@@ -45,7 +45,8 @@ d3.csv("energy.csv", function(d) {
 		solar: +d["Consumption.Commercial.Solar"] + +d["Consumption.Industrial.Solar"],
 		wind: +d["Consumption.Commercial.Wind"] + +d["Consumption.Industrial.Wind"],
 		wood: +d["Consumption.Commercial.Wood"] + +d["Consumption.Electric Power.Wood"] + +d["Consumption.Industrial.Wood"] + +d["Consumption.Residential.Wood"],
-		otherPetrol: +d["Consumption.Industrial.Other Petroleum Products"]
+		otherPetrol: +d["Consumption.Industrial.Other Petroleum Products"],
+        population: +d["Population"]
 	};
 }).then( function(data) {
 
@@ -118,11 +119,9 @@ d3.csv("energy.csv", function(d) {
                 .style("background-color", "lightgrey");
 
     const barWidth = 7;
-
-
+    
 
     // ***** BARS!!! *****//
-
 
     var nonrenewableBars = svg.append("g")
         .selectAll("dot")
@@ -131,18 +130,11 @@ d3.csv("energy.csv", function(d) {
         .attr("x", function(d) { return x(d['state']); })
 
 
+        .attr("y", function(d) { return y(d['nonrenewablePerCapita']); })
+        .attr("height", function(d) { return height - y(d['nonrenewablePerCapita']); })
 
 
-
-        .attr("y", function(d) { return y(d['nonrenewable']); })
-        .attr("height", function(d) { return height - y(d['nonrenewable']); })
-
-
-
-
-
-
-
+        
         .attr("width", barWidth)
         .attr("fill", 'red')
         .on("mouseover", function(e,d) {
@@ -164,9 +156,11 @@ d3.csv("energy.csv", function(d) {
         .attr("x", function(d) { return x(d['state']) + barWidth; })
 
 
-        // STUFf
+
+        // stuff
         .attr("y", function(d) { return y(d['renewable']); })
         .attr("height", function(d) { return height - y(d['renewable']); })
+
 
 
 
@@ -187,7 +181,47 @@ d3.csv("energy.csv", function(d) {
         .on("mouseout", function() { return tooltip.style("visibility", "hidden"); })
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // *** END BARS!!! ///
+
+
+
+
+
 
 
 
