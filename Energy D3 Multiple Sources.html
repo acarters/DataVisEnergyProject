@@ -70,6 +70,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 	};
 }).then( function(data) 
 {		
+	var minValue = 1000;
 	var thisState = "Select State"; // Currently hard-coded state value. Change this to get graphs for other states.
 	var stateData = data.filter(d => d.state == thisState);
 	const data1987 = data.filter(d => d.year == 1987); // Just the data for 1987. Arbitrary year, but this ensures we can populate drop-down with only one value per state.
@@ -122,29 +123,30 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		const legendContainer = document.getElementById("legend");
 		legendContainer.style.marginTop = "auto"; // Reset the top margin
 		legendContainer.style.marginLeft = "1000px"; // Add this line to move the legend container to the right
+		legendContainer.style.transform = `translate(0, ${-height}px)`;
+		legendContainer.style.border = "none";
 
 		const legend = d3.select(legendContainer)
 			.selectAll(".legend")
 			.data(fuelTypes)
-			.enter().append("div")
+			.enter().append("g")
 			.attr("class", "legend")
 			.style("display", "flex")
 			.style("align-items", "center")
 			.style("margin-bottom", "5px")
 			.style("font-family", "sans-serif")
-			.style("font-size", "12px");
-
-			legendContainer.style.border = "1px solid #ccc"; // Add this line for the border around the legend container
+			.style("font-size", "12px")
 
 
-		legend.append("div")
+		legend.append("g")
 			.style("width", "18px")
 			.style("height", "18px")
+			.attr("transform", `translate(0, ${height})`)
 			.style("background-color", (d, i) => colors[i]);
 
 		legend.append("span")
 			.text((d, i) => fuelTypes[i])
-			.style("margin-left", "5px");
+			.style("margin-left", "5px")
         
         svg.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -185,7 +187,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.wood == 0)
+			if (d.wood <= minValue)
 			{
 				return "hidden";
 			}
@@ -229,7 +231,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.petroleum == 0)
+			if (d.petroleum <= minValue)
 			{
 				return "hidden";
 			}
@@ -275,7 +277,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("stroke-width", 5)
 		.attr("visibility", function(d)
 		{
-			if (d.solar == 0)
+			if (d.solar <= minValue)
 			{
 				return "hidden";
 			}
@@ -317,7 +319,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.geothermal == 0)
+			if (d.geothermal <= minValue)
 			{
 				return "hidden";
 			}
@@ -361,7 +363,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.hydropower == 0)
+			if (d.hydropower <= minValue)
 			{
 				return "hidden";
 			}
@@ -405,7 +407,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.kerosene == 0)
+			if (d.kerosene <= minValue)
 			{
 				return "hidden";
 			}
@@ -449,7 +451,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.coal == 0)
+			if (d.coal <= minValue)
 			{
 				return "hidden";
 			}
@@ -493,7 +495,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 				.attr("visibility", function(d)
 		{
-			if (d.naturalGas == 0)
+			if (d.naturalGas <= minValue)
 			{
 				return "hidden";
 			}
@@ -539,7 +541,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("stroke-width", 5)
 		.attr("visibility", function(d)
 		{
-			if (d.otherPetrol == 0)
+			if (d.otherPetrol <= minValue)
 			{
 				return "hidden";
 			}
@@ -614,7 +616,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         })
 		.attr("visibility", function(d)
 		{
-			if (d.wind == 0)
+			if (d.wind <= minValue)
 			{
 				return "hidden";
 			}
@@ -643,7 +645,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("fill", "orange")
 		.attr("visibility", function(d)
 		{
-			if (d.wood == 0)
+			if (d.wood <= minValue)
 			{
 				return "hidden";
 			}
@@ -685,7 +687,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("fill", "purple")
 		.attr("visibility", function(d)
 		{
-			if (d.wind == 0)
+			if (d.wind <= minValue)
 			{
 				return "hidden";
 			}
@@ -727,7 +729,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("fill", "yellow")
 		.attr("visibility", function(d)
 		{
-			if (d.solar == 0)
+			if (d.solar <= minValue)
 			{
 				return "hidden";
 			}
@@ -769,7 +771,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
         .attr("fill", "blue")
 		.attr("visibility", function(d)
 		{
-			if (d.geothermal == 0)
+			if (d.geothermal <= minValue)
 			{
 				return "hidden";
 			}
@@ -810,7 +812,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "black")	
 		.attr("visibility", function(d)
 		{
-			if (d.coal == 0)
+			if (d.coal <= minValue)
 			{
 				return "hidden";
 			}
@@ -851,7 +853,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "pink")
 		.attr("visibility", function(d)
 		{
-			if (d.distFuelOil == 0)
+			if (d.distFuelOil <= minValue)
 			{
 				return "hidden";
 			}
@@ -892,7 +894,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "grey")
 		.attr("visibility", function(d)
 		{
-			if (d.hydropower == 0)
+			if (d.hydropower <= minValue)
 			{
 				return "hidden";
 			}
@@ -933,7 +935,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "red")
 		.attr("visibility", function(d)
 		{
-			if (d.petroleum == 0)
+			if (d.petroleum <= minValue)
 			{
 				return "hidden";
 			}
@@ -974,7 +976,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "lime")
 		.attr("visibility", function(d)
 		{
-			if (d.naturalGas == 0)
+			if (d.naturalGas <= minValue)
 			{
 				return "hidden";
 			}
@@ -1015,7 +1017,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "teal")
 		.attr("visibility", function(d)
 		{
-			if (d.kerosene == 0)
+			if (d.kerosene <= minValue)
 			{
 				return "hidden";
 			}
@@ -1056,7 +1058,7 @@ d3.csv("energy.csv", function(d) //Load the data from the csv.
 		.attr("fill", "brown")
 		.attr("visibility", function(d)
 		{
-			if (d.otherPetrol == 0)
+			if (d.otherPetrol <= minValue)
 			{
 				return "hidden";
 			}
